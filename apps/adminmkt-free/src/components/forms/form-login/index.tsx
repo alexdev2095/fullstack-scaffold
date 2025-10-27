@@ -1,26 +1,26 @@
 "use client";
 
-import {useState} from "react";
+import { useState } from "react";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {loginSchema} from "@/types/auth";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import { Input } from "@/components/ui/input";
+import { loginSchema } from "@/core/types/auth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export function FormLogin() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,8 +30,8 @@ export function FormLogin() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "jotredev@gmail.com",
-      password: "12345678"
-    }
+      password: "12345678",
+    },
   });
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
@@ -52,7 +52,7 @@ export function FormLogin() {
           <FormField
             control={form.control}
             name="email"
-            render={({field}) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-white">
                   Correo electrónico <span className="text-destructive">*</span>
@@ -72,7 +72,7 @@ export function FormLogin() {
           <FormField
             control={form.control}
             name="password"
-            render={({field}) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-white">
                   Contraseña <span className="text-destructive">*</span>
