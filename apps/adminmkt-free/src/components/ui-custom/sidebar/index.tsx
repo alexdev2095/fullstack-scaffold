@@ -23,24 +23,6 @@ import {
 import { Logo } from "@/components/ui-custom/logo";
 import { Button } from "@/components/ui/button";
 
-const settingsMenuItems = [
-  {
-    href: "/settings/profile",
-    label: "Perfil",
-    icon: IoPeopleOutline,
-  },
-  {
-    href: "/settings/account",
-    label: "Cuenta",
-    icon: IoSettingsOutline,
-  },
-  {
-    href: "/settings/team",
-    label: "Equipo",
-    icon: IoPeopleOutline,
-  },
-];
-
 export function Sidebar() {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
   const pathname = usePathname();
@@ -59,6 +41,7 @@ export function Sidebar() {
               <Logo />
             </Link>
           </div>
+          {/* <div className="bg-secondary rounded-full "> */}
           <ul className="bg-secondary rounded-full p-1 space-y-1">
             <li>
               <Link
@@ -138,6 +121,7 @@ export function Sidebar() {
               </Link>
             </li>
           </ul>
+          {/* </div> */}
 
           <Separator className="my-5" />
           <ul className="bg-secondary rounded-full p-1 space-y-1">

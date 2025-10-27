@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
-import { Header } from "@/layouts/header/headerContainer";
-import { Sidebar } from "@/layouts/sidebar/sidebarContainer";
+import {Header} from "@/components/ui-custom/header";
+import {Sidebar} from "@/components/ui-custom/sidebar";
+import {ReactNode} from "react";
 
-export default function MainLayout({ children }: { children: ReactNode }) {
+export default function MainLayout({children}: {children: ReactNode}) {
   return (
     <div className="h-screen flex overflow-hidden">
       <Sidebar />

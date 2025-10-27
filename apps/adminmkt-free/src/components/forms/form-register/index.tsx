@@ -1,20 +1,20 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
 
-import { Button } from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { registerSchema } from "@/core/types/auth";
+import {Input} from "@/components/ui/input";
+import {registerSchema} from "@/types/auth";
 import Link from "next/link";
 
 export function FormRegister() {
@@ -24,8 +24,8 @@ export function FormRegister() {
       firstName: "",
       lastName: "",
       email: "",
-      password: "",
-    },
+      password: ""
+    }
   });
 
   function onSubmit(values: z.infer<typeof registerSchema>) {
@@ -40,7 +40,7 @@ export function FormRegister() {
             <FormField
               control={form.control}
               name="firstName"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel className="text-white">
                     Nombre (s) <span className="text-destructive">*</span>
@@ -59,7 +59,7 @@ export function FormRegister() {
             <FormField
               control={form.control}
               name="lastName"
-              render={({ field }) => (
+              render={({field}) => (
                 <FormItem>
                   <FormLabel className="text-white">
                     Apellidos <span className="text-destructive">*</span>
@@ -79,7 +79,7 @@ export function FormRegister() {
           <FormField
             control={form.control}
             name="email"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel className="text-white">
                   Correo electrónico <span className="text-destructive">*</span>
@@ -99,7 +99,7 @@ export function FormRegister() {
           <FormField
             control={form.control}
             name="password"
-            render={({ field }) => (
+            render={({field}) => (
               <FormItem>
                 <FormLabel className="text-white">
                   Contraseña <span className="text-destructive">*</span>
