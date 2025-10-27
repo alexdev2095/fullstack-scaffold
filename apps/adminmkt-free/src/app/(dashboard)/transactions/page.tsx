@@ -1,10 +1,4 @@
-import {Cards} from "@/components/pages/transactions/cards";
-import {TransactionsTable} from "@/components/pages/transactions/transactions-table";
-import {DatePickerWithPresets} from "@/components/ui-custom/date-picker";
-import {Title} from "@/components/ui-custom/title";
-import {Button} from "@/components/ui/button";
-
-import {IoCloudUploadOutline, IoReload} from "react-icons/io5";
+import { Title } from "@/components/ui-custom/title";
 
 export default function TransactionsPage() {
   return (
@@ -16,19 +10,6 @@ export default function TransactionsPage() {
             Gestione sus transacciones de venta.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <DatePickerWithPresets />
-          <Button size="sm" variant="outline" className="border-none">
-            <IoCloudUploadOutline className="size-5" /> Exportar
-          </Button>
-          <Button size="icon" variant="outline" className="border-none">
-            <IoReload className="size-5" />
-          </Button>
-        </div>
-      </div>
-      <Cards />
-      <div className="grid grid-cols-1">
-        <TransactionsTable />
       </div>
     </div>
   );
