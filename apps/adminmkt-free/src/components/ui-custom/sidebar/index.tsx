@@ -70,11 +70,15 @@ export function Sidebar() {
             </li>
             <li>
               <Link
-                href="/products"
+                href="/products/catalog"
                 onClick={() => setShowSidebar(false)}
                 className={cn(
                   "flex size-10 mx-auto items-center justify-center rounded-full hover:bg-background transition-colors duration-150",
-                  pathname === "/products" &&
+                  [
+                    "/products",
+                    "/products/catalog",
+                    "/products/warehouse",
+                  ].includes(pathname) &&
                     "bg-primary text-white hover:bg-primary"
                 )}
               >
