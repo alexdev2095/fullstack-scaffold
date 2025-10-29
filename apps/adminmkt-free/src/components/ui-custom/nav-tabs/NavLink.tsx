@@ -5,19 +5,32 @@ import { useNavigation } from "@/core/hooks/useNavigation";
 
 interface LinkProps {
   href: string;
-  label?: string;
+  nav: string[];
   children: React.ReactNode;
+  onClick?: () => void;
+  classNameLink?: string;
 }
 
-export const NavLink = ({ href, children }: LinkProps) => {
-  const { isActive } = useNavigation(href);
+export const NavLink = ({
+  href,
+  children,
+  nav,
+  onClick,
+  classNameLink,
+}: LinkProps) => {
+  const { isActive } = useNavigation(nav);
+
+  const classNameUpdate = classNameLink
+    ? classNameLink
+    : "py-2 px-4 rounded-full block hover:bg-secondary transition-colors duration-150";
 
   return (
     <li>
       <Link
         href={href}
+        onClick={onClick}
         className={cn(
-          "py-2 px-4 rounded-full block hover:bg-secondary transition-colors duration-150",
+          classNameUpdate,
           isActive && "bg-primary text-white hover:bg-primary"
         )}
       >
