@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { NavTabs } from "@/components/ui-custom/nav-tabs/NavTabs";
 import { menuConfig, menuSiderbar } from "./menuSiderbar";
 
-export function SidebarContainer() {
+export function Sidebar() {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
   const fnShowSidebar = () => setShowSidebar(false);
