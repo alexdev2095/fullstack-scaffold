@@ -14,8 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Tus modelos aquí
-
 model Product {
   id          String   @id @default(uuid())
   sku         String   @unique @db.VarChar(50)
@@ -35,8 +33,9 @@ model Product {
   created_at  DateTime @default(now()) @db.Timestamptz
   updated_at  DateTime @updatedAt @db.Timestamptz
 
-  images    ProductImage[]
-  locations Location[]
+  images          ProductImage[]
+  locations       Location[]
+  stock_movements StockMovement[]
 
   @@map("products")
 }
@@ -69,7 +68,8 @@ model Warehouse {
   created_at    DateTime @default(now()) @db.Timestamptz
   updated_at    DateTime @updatedAt @db.Timestamptz
 
-  locations Location[]
+  locations       Location[]
+  stock_movements StockMovement[]
 
   @@map("warehouses")
 }
@@ -88,9 +88,38 @@ model Location {
   created_at   DateTime @default(now()) @db.Timestamptz
   updated_at   DateTime @updatedAt @db.Timestamptz
 
-  warehouse Warehouse @relation(fields: [warehouse_id], references: [id], onDelete: Cascade)
-  product   Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  warehouse      Warehouse       @relation(fields: [warehouse_id], references: [id], onDelete: Cascade)
+  product        Product         @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  stockMovements StockMovement[]
 
   @@unique([warehouse_id, section, shelf, level])
   @@map("locations")
+}
+
+model StockMovement {
+  id             String       @id @default(uuid())
+  product_id     String
+  warehouse_id   String
+  location_id    String?
+  type           MovementType
+  quantity       Int
+  previous_stock Int
+  new_stock      Int
+  reason         String?      @db.VarChar(255)
+  notes          String?      @db.Text
+  created_by     String?      @db.VarChar(100)
+  created_at     DateTime     @default(now()) @db.Timestamptz
+
+  product   Product   @relation(fields: [product_id], references: [id])
+  warehouse Warehouse @relation(fields: [warehouse_id], references: [id])
+  location  Location? @relation(fields: [location_id], references: [id])
+
+  @@map("stock_movements")
+}
+
+enum MovementType {
+  ENTRADA
+  SALIDA
+  AJUSTE
+  TRANSFERENCIA
 }
