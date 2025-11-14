@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Stock } from 'src/common/types/stocks';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { WarehouseEntity } from 'src/warehouses/entities/warehouse.entity';
 
@@ -50,7 +51,7 @@ export class LocationEntity {
   warehouse?: WarehouseEntity;
 
   @ApiProperty({ description: 'Stock status', example: 'IN_STOCK' })
-  stock_status?: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  stock_status?: Stock;
 
   constructor(partial: Partial<LocationEntity>) {
     Object.assign(this, partial);
