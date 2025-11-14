@@ -15,13 +15,82 @@ datasource db {
 }
 
 // Tus modelos aquí
+
 model Product {
   id          String   @id @default(uuid())
-  name        String
-  description String?
+  sku         String   @unique @db.VarChar(50)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
   price       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  cost        Float?
+  category    String?  @db.VarChar(100)
+  brand       String?  @db.VarChar(100)
+  weight      Float?
+  length      Float?
+  width       Float?
+  height      Float?
+  min_stock   Int      @default(0)
+  max_stock   Int?
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @updatedAt @db.Timestamptz
+
+  images    ProductImage[]
+  locations Location[]
 
   @@map("products")
+}
+
+model ProductImage {
+  id         String   @id @default(uuid())
+  product_id String
+  url        String   @db.VarChar(500)
+  filename   String   @db.VarChar(255)
+  is_primary Boolean  @default(false)
+  order      Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model Warehouse {
+  id            String   @id @default(uuid())
+  code          String   @unique @db.VarChar(20)
+  name          String   @db.VarChar(255)
+  address       String?  @db.Text
+  phone         String?  @db.VarChar(20)
+  email         String?  @db.VarChar(100)
+  capacity      Int
+  used_capacity Int      @default(0)
+  manager       String?  @db.VarChar(100)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now()) @db.Timestamptz
+  updated_at    DateTime @updatedAt @db.Timestamptz
+
+  locations Location[]
+
+  @@map("warehouses")
+}
+
+model Location {
+  id           String   @id @default(uuid())
+  warehouse_id String
+  product_id   String
+  code         String   @db.VarChar(50)
+  section      String   @db.VarChar(10)
+  shelf        String   @db.VarChar(10)
+  level        String   @db.VarChar(10)
+  quantity     Int      @default(0)
+  min_quantity Int      @default(0)
+  max_quantity Int?
+  created_at   DateTime @default(now()) @db.Timestamptz
+  updated_at   DateTime @updatedAt @db.Timestamptz
+
+  warehouse Warehouse @relation(fields: [warehouse_id], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([warehouse_id, section, shelf, level])
+  @@map("locations")
 }
