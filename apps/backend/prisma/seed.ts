@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-import { MovementType } from 'generated/prisma/enums';
+import { MovementType, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 

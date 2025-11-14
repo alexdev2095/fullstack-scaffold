@@ -1,9 +1,10 @@
+import {
+  StockMovement as PrismaStockMovement,
+  MovementType,
+} from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { MovementType } from 'generated/prisma/enums';
-import { LocationEntity } from 'src/locations/entities/location.entity';
-import { ProductEntity } from 'src/products/entities/product.entity';
-import { WarehouseEntity } from 'src/warehouses/entities/warehouse.entity';
-export class StockMovementEntity {
+
+export class StockMovementEntity implements PrismaStockMovement {
   @ApiProperty({ description: 'Stock movement ID' })
   id: string;
 
@@ -42,15 +43,6 @@ export class StockMovementEntity {
 
   @ApiProperty({ description: 'Creation date' })
   created_at: Date;
-
-  @ApiProperty({ type: () => ProductEntity, required: false })
-  product?: ProductEntity;
-
-  @ApiProperty({ type: () => WarehouseEntity, required: false })
-  warehouse?: WarehouseEntity;
-
-  @ApiProperty({ type: () => LocationEntity, required: false })
-  location?: LocationEntity;
 
   constructor(partial: Partial<StockMovementEntity>) {
     Object.assign(this, partial);

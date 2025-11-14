@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Warehouse } from '@prisma/client';
 import { LocationEntity } from 'src/locations/entities/location.entity';
 
-export class WarehouseEntity {
+export class WarehouseEntity implements Warehouse {
   @ApiProperty({
     description: 'Warehouse ID',
     example: '123e4567-e89b-12d3-a456-426614174000',
@@ -41,10 +42,15 @@ export class WarehouseEntity {
   @ApiProperty({ description: 'Last update date' })
   updated_at: Date;
 
-  @ApiProperty({ type: [LocationEntity], required: false })
-  locations?: Location[];
+  // Cambiar el tipo para que sea compatible con Prisma
+  @ApiProperty({ type: () => [Object], required: false })
+  locations?: any[];
 
-  @ApiProperty({ description: 'Capacity percentage', example: 45 })
+  @ApiProperty({
+    description: 'Capacity percentage',
+    example: 45,
+    required: false,
+  })
   capacity_percentage?: number;
 
   constructor(partial: Partial<WarehouseEntity>) {

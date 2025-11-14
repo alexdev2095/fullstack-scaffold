@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { MovementType } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsEnum,
@@ -8,7 +9,6 @@ import {
   IsUUID,
   Min,
 } from 'class-validator';
-import { MovementType } from 'generated/prisma/enums';
 
 export class CreateStockMovementDto {
   @ApiProperty({ description: 'Product ID' })

@@ -1,13 +1,12 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateStockMovementDto } from './dto/create-stock-movement.dto';
-import { UpdateStockMovementDto } from './dto/update-stock-movement.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { StockMovementEntity } from './entities/stock-movement.entity';
-import { MovementType } from 'generated/prisma/enums';
+import { MovementType } from '@prisma/client';
 
 @Injectable()
 export class StockMovementsService {
@@ -27,7 +26,7 @@ export class StockMovementsService {
       created_by,
     } = createStockMovementDto;
 
-    //FIXME: Check if product exists
+    // Verificar que el producto existe
     const product = await this.prisma.product.findUnique({
       where: { id: product_id },
     });
@@ -36,7 +35,7 @@ export class StockMovementsService {
       throw new NotFoundException(`Product with ID ${product_id} not found`);
     }
 
-    // FIXME: Check if warehouse exists
+    // Verificar que el almacén existe
     const warehouse = await this.prisma.warehouse.findUnique({
       where: { id: warehouse_id },
     });
@@ -47,10 +46,12 @@ export class StockMovementsService {
       );
     }
 
-    // FIXME: If location_id is provided, check if it exists and belongs to the warehouse and product
-    let location = null;
+    let previousStock = 0;
+    let newStock = 0;
+
+    // Si se proporciona location_id, trabajar con ubicación específica
     if (location_id) {
-      location = await this.prisma.location.findFirst({
+      const location = await this.prisma.location.findFirst({
         where: {
           id: location_id,
           warehouse_id,
@@ -63,18 +64,18 @@ export class StockMovementsService {
           `Location with ID ${location_id} not found for this product and warehouse`,
         );
       }
-    }
 
-    // Calculate previous and new stock
-    let previousStock = 0;
-    let newStock = 0;
-
-    if (location) {
       previousStock = location.quantity;
       newStock = this.calculateNewStock(previousStock, quantity, type);
+
+      // Actualizar la cantidad en la ubicación
+      await this.prisma.location.update({
+        where: { id: location_id },
+        data: { quantity: newStock },
+      });
     } else {
-      // Get total stock for product in warehouse
-      const totalStock = await this.prisma.location.aggregate({
+      // Trabajar con stock total del producto en el almacén
+      const totalStockResult = await this.prisma.location.aggregate({
         where: {
           warehouse_id,
           product_id,
@@ -83,11 +84,15 @@ export class StockMovementsService {
           quantity: true,
         },
       });
-      previousStock = totalStock._sum.quantity || 0;
+
+      previousStock = totalStockResult._sum.quantity || 0;
       newStock = this.calculateNewStock(previousStock, quantity, type);
     }
 
-    // Create stock movement
+    // Actualizar la capacidad del almacén
+    await this.updateWarehouseCapacity(warehouse_id);
+
+    // Crear el movimiento de stock sin relaciones
     const stockMovement = await this.prisma.stockMovement.create({
       data: {
         product_id,
@@ -101,44 +106,13 @@ export class StockMovementsService {
         notes,
         created_by,
       },
-      include: {
-        product: true,
-        warehouse: true,
-        location: {
-          include: {
-            product: true,
-            warehouse: true,
-          },
-        },
-      },
     });
-
-    //FIXME: Update location quantity if location is specified
-    if (location) {
-      await this.prisma.location.update({
-        where: { id: location_id },
-        data: { quantity: newStock },
-      });
-
-      // Update warehouse capacity
-      await this.updateWarehouseCapacity(warehouse_id);
-    }
 
     return new StockMovementEntity(stockMovement);
   }
 
   async findAll(): Promise<StockMovementEntity[]> {
     const movements = await this.prisma.stockMovement.findMany({
-      include: {
-        product: true,
-        warehouse: true,
-        location: {
-          include: {
-            product: true,
-            warehouse: true,
-          },
-        },
-      },
       orderBy: { created_at: 'desc' },
     });
 
@@ -148,16 +122,6 @@ export class StockMovementsService {
   async findByProduct(productId: string): Promise<StockMovementEntity[]> {
     const movements = await this.prisma.stockMovement.findMany({
       where: { product_id: productId },
-      include: {
-        product: true,
-        warehouse: true,
-        location: {
-          include: {
-            product: true,
-            warehouse: true,
-          },
-        },
-      },
       orderBy: { created_at: 'desc' },
     });
 
@@ -167,16 +131,6 @@ export class StockMovementsService {
   async findByWarehouse(warehouseId: string): Promise<StockMovementEntity[]> {
     const movements = await this.prisma.stockMovement.findMany({
       where: { warehouse_id: warehouseId },
-      include: {
-        product: true,
-        warehouse: true,
-        location: {
-          include: {
-            product: true,
-            warehouse: true,
-          },
-        },
-      },
       orderBy: { created_at: 'desc' },
     });
 
@@ -186,13 +140,41 @@ export class StockMovementsService {
   async findOne(id: string): Promise<StockMovementEntity> {
     const movement = await this.prisma.stockMovement.findUnique({
       where: { id },
+    });
+
+    if (!movement) {
+      throw new NotFoundException(`Stock movement with ID ${id} not found`);
+    }
+
+    return new StockMovementEntity(movement);
+  }
+
+  // Método separado para obtener movimientos con relaciones (si es necesario)
+  async findOneWithDetails(id: string): Promise<any> {
+    const movement = await this.prisma.stockMovement.findUnique({
+      where: { id },
       include: {
-        product: true,
-        warehouse: true,
+        product: {
+          select: {
+            id: true,
+            sku: true,
+            name: true,
+          },
+        },
+        warehouse: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
+          },
+        },
         location: {
-          include: {
-            product: true,
-            warehouse: true,
+          select: {
+            id: true,
+            code: true,
+            section: true,
+            shelf: true,
+            level: true,
           },
         },
       },
@@ -202,7 +184,7 @@ export class StockMovementsService {
       throw new NotFoundException(`Stock movement with ID ${id} not found`);
     }
 
-    return new StockMovementEntity(movement);
+    return movement;
   }
 
   private calculateNewStock(
@@ -222,9 +204,13 @@ export class StockMovementsService {
         }
         return newStock;
       case 'AJUSTE':
-        return quantity; // For adjustments, quantity becomes the new stock
+        return quantity;
       case 'TRANSFERENCIA':
-        return previousStock - quantity; // For transfers, we subtract from source
+        const transferStock = previousStock - quantity;
+        if (transferStock < 0) {
+          throw new BadRequestException('Insufficient stock for transfer');
+        }
+        return transferStock;
       default:
         return previousStock;
     }
@@ -241,12 +227,4 @@ export class StockMovementsService {
       data: { used_capacity: totalQuantity._sum.quantity || 0 },
     });
   }
-
-  // update(id: number, updateStockMovementDto: UpdateStockMovementDto) {
-  //   return `This action updates a #${id} stockMovement`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} stockMovement`;
-  // }
 }

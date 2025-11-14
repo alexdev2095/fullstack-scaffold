@@ -27,8 +27,7 @@
     "db:push": "prisma db push",
     "prisma:migrate": "node -r dotenv/config ./node_modules/prisma/build/index.js migrate dev",
     "prisma:studio": "node -r dotenv/config ./node_modules/prisma/build/index.js studio",
-    "prisma:generate": "node -r dotenv/config ./node_modules/prisma/build/index.js generate",
-    "prisma:seed": "node -r dotenv/config ./node_modules/prisma/build/index.js ts-node --transpile-only prisma/seed.ts"
+    "prisma:generate": "node -r dotenv/config ./node_modules/prisma/build/index.js generate"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -70,6 +69,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },
