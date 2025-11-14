@@ -3,7 +3,6 @@ import { MovementType } from 'generated/prisma/enums';
 import { LocationEntity } from 'src/locations/entities/location.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { WarehouseEntity } from 'src/warehouses/entities/warehouse.entity';
-
 export class StockMovementEntity {
   @ApiProperty({ description: 'Stock movement ID' })
   id: string;
