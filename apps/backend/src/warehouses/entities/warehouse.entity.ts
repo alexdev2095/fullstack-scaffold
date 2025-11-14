@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { LocationEntity } from 'src/locations/entities/location.entity';
 
 export class WarehouseEntity {
   @ApiProperty({
