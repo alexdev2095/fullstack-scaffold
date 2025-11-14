@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "@nestjs/mapped-types": "*"
+  },
   "name": "fullstack-scaffold",
   "private": true,
   "scripts": {
