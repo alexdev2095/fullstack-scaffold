@@ -8,24 +8,21 @@ import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WarehouseEntity } from './entities/warehouse.entity';
+import { DatabaseWarehouseValidator } from 'src/common/validators/database-warehouse.validator';
 
 @Injectable()
 export class WarehousesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private validatorWarehouse: DatabaseWarehouseValidator,
+  ) {}
 
   async create(
     createWarehouseDto: CreateWarehouseDto,
   ): Promise<WarehouseEntity> {
-    // Check if code already exists
-    const existingWarehouse = await this.prisma.warehouse.findUnique({
-      where: { code: createWarehouseDto.code },
-    });
-
-    if (existingWarehouse) {
-      throw new ConflictException(
-        `Warehouse with code ${createWarehouseDto.code} already exists`,
-      );
-    }
+    await this.validatorWarehouse.validateUniqueWarehouseCode(
+      createWarehouseDto.code,
+    );
 
     const warehouse = await this.prisma.warehouse.create({
       data: createWarehouseDto,
@@ -108,17 +105,11 @@ export class WarehousesService {
     // Check if warehouse exists
     await this.findOne(id);
 
-    // If updating code, check if it already exists
     if (updateWarehouseDto.code) {
-      const existingWithCode = await this.prisma.warehouse.findUnique({
-        where: { code: updateWarehouseDto.code },
-      });
-
-      if (existingWithCode && existingWithCode.id !== id) {
-        throw new ConflictException(
-          `Warehouse with code ${updateWarehouseDto.code} already exists`,
-        );
-      }
+      await this.validatorWarehouse.validateUniqueWarehouseCode(
+        updateWarehouseDto.code,
+        id,
+      );
     }
 
     const warehouse = await this.prisma.warehouse.update({
@@ -143,19 +134,8 @@ export class WarehousesService {
   }
 
   async remove(id: string): Promise<void> {
-    // Check if warehouse exists
     await this.findOne(id);
-
-    // Check if warehouse has locations
-    const locationsCount = await this.prisma.location.count({
-      where: { warehouse_id: id },
-    });
-
-    if (locationsCount > 0) {
-      throw new BadRequestException(
-        'Cannot delete warehouse with existing locations. Remove locations first.',
-      );
-    }
+    await this.validatorWarehouse.validateWarehouseHasNoLocations(id);
 
     await this.prisma.warehouse.delete({
       where: { id },
