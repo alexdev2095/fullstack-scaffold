@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { WerehousesModule } from './warehouses/warehouses.module';
 import { LocationsModule } from './locations/locations.module';
 import { StockMovementsModule } from './stock-movements/stock-movements.module';
+import { ValidatorsModule } from './common/validators/validators.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { StockMovementsModule } from './stock-movements/stock-movements.module';
     WerehousesModule,
     LocationsModule,
     StockMovementsModule,
+    ValidatorsModule,
   ],
   controllers: [],
   providers: [],
