@@ -13,97 +13,69 @@ export class ProductEntity {
   @ApiProperty({ description: 'Product name', example: 'Laptop HP Pavilion' })
   name: string;
 
-  @ApiProperty({
-    description: 'Product description',
-    required: false,
-    example: 'Laptop HP Pavilion 15.6" Intel Core i5',
-  })
-  description: string | null;
+  @ApiProperty({ description: 'Product description', required: false })
+  description?: string | null;
 
   @ApiProperty({ description: 'Selling price', example: 899.99 })
   price: number;
 
-  @ApiProperty({ description: 'Cost price', required: false, example: 650.0 })
-  cost: number | null;
+  @ApiProperty({ description: 'Cost price', required: false })
+  cost?: number | null;
 
-  @ApiProperty({
-    description: 'Product category',
-    required: false,
-    example: 'Tecnología',
-  })
-  category: string | null;
+  @ApiProperty({ description: 'Product category', required: false })
+  category?: string | null;
 
-  @ApiProperty({ description: 'Product brand', required: false, example: 'HP' })
-  brand: string | null;
+  @ApiProperty({ description: 'Product brand', required: false })
+  brand?: string | null;
 
-  @ApiProperty({
-    description: 'Product weight in kg',
-    required: false,
-    example: 2.1,
-  })
-  weight: number | null;
+  @ApiProperty({ description: 'Product weight in kg', required: false })
+  weight?: number | null;
 
-  @ApiProperty({
-    description: 'Product length in cm',
-    required: false,
-    example: 36.0,
-  })
-  length: number | null;
+  @ApiProperty({ description: 'Product length in cm', required: false })
+  length?: number | null;
 
-  @ApiProperty({
-    description: 'Product width in cm',
-    required: false,
-    example: 24.5,
-  })
-  width: number | null;
+  @ApiProperty({ description: 'Product width in cm', required: false })
+  width?: number | null;
 
-  @ApiProperty({
-    description: 'Product height in cm',
-    required: false,
-    example: 2.3,
-  })
-  height: number | null;
+  @ApiProperty({ description: 'Product height in cm', required: false })
+  height?: number | null;
 
   @ApiProperty({ description: 'Minimum stock level', example: 5 })
   min_stock: number;
 
-  @ApiProperty({
-    description: 'Maximum stock level',
-    required: false,
-    example: 50,
-  })
-  max_stock: number | null;
+  @ApiProperty({ description: 'Maximum stock level', required: false })
+  max_stock?: number | null;
 
   @ApiProperty({ description: 'Product active status', example: true })
   is_active: boolean;
 
-  @ApiProperty({
-    description: 'Creation date',
-    example: '2024-01-15T10:30:00.000Z',
-  })
+  @ApiProperty({ description: 'Creation date' })
   created_at: Date;
 
-  @ApiProperty({
-    description: 'Last update date',
-    example: '2024-01-15T10:30:00.000Z',
-  })
+  @ApiProperty({ description: 'Last update date' })
   updated_at: Date;
 
-  // Relations (optional - only when included in query)
-  //   @ApiProperty({ type: () => [ProductImageEntity], required: false })
-  //   images?: ProductImage[];
-
-  //   @ApiProperty({ type: () => [LocationEntity], required: false })
-  //   locations?: Location[];
-
-  // Virtual fields (computed)
   @ApiProperty({
     description: 'Total stock across all locations',
     required: false,
   })
   total_stock?: number;
 
+  @ApiProperty({ description: 'Stock status', required: false })
+  stock_status?: string;
+
   constructor(partial: Partial<ProductEntity>) {
-    Object.assign(this, partial);
+    // Convertir null a undefined para compatibilidad
+    const processedPartial: any = {};
+
+    for (const key in partial) {
+      if (partial[key] === null) {
+        processedPartial[key] = undefined;
+      } else {
+        processedPartial[key] = partial[key];
+      }
+    }
+
+    Object.assign(this, processedPartial);
   }
 }

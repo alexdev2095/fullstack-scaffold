@@ -1,7 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Stock } from 'src/common/types/stocks';
-import { ProductEntity } from 'src/products/entities/product.entity';
-import { WarehouseEntity } from 'src/warehouses/entities/warehouse.entity';
 
 export class LocationEntity {
   @ApiProperty({ description: 'Location ID' })
@@ -36,7 +33,7 @@ export class LocationEntity {
     required: false,
     example: 30,
   })
-  max_quantity: number | null;
+  max_quantity: number | null; // ✅ Cambiar a null para compatibilidad con Prisma
 
   @ApiProperty({ description: 'Creation date' })
   created_at: Date;
@@ -44,14 +41,8 @@ export class LocationEntity {
   @ApiProperty({ description: 'Last update date' })
   updated_at: Date;
 
-  @ApiProperty({ type: () => ProductEntity, required: false })
-  product?: ProductEntity;
-
-  @ApiProperty({ type: () => WarehouseEntity, required: false })
-  warehouse?: WarehouseEntity;
-
-  @ApiProperty({ description: 'Stock status', example: 'IN_STOCK' })
-  stock_status?: Stock;
+  @ApiProperty({ description: 'Stock status', required: false })
+  stock_status?: string;
 
   constructor(partial: Partial<LocationEntity>) {
     Object.assign(this, partial);

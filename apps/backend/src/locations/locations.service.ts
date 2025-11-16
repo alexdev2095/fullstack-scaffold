@@ -8,61 +8,36 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { LocationEntity } from './entities/location.entity';
 import { AssignProductDto, CreateLocationDto, UpdateLocationDto } from './dto';
 import { Stock } from 'src/common/types/stocks';
+import { DatabaseWarehouseValidator } from 'src/common/validators/database-warehouse.validator';
+import { DatabaseLocationValidator } from 'src/common/validators/database-location.validator';
+import { DatabaseProductValidator } from 'src/common/validators/database-product.validator';
+import { WarehouseLocation } from 'src/common/types/location';
 
 @Injectable()
 export class LocationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private validatorLocation: DatabaseLocationValidator,
+    private validatorWarehouse: DatabaseWarehouseValidator,
+    private validatorProduct: DatabaseProductValidator,
+  ) {}
 
   async create(createLocationDto: CreateLocationDto): Promise<LocationEntity> {
-    /**
-     * FIXME: Crear en una utilidad y despues replazarlo
-     *
-     */
-    const warehouse = await this.prisma.warehouse.findUnique({
-      where: { id: createLocationDto.warehouse_id },
-    });
+    await this.validatorWarehouse.validateWarehouseExists(
+      createLocationDto.warehouse_id,
+    );
 
-    if (!warehouse) {
-      throw new NotFoundException(
-        `Warehouse with ID ${createLocationDto.warehouse_id} not found`,
-      );
-    }
+    await this.validatorProduct.validateProductExists(
+      createLocationDto.product_id,
+    );
 
-    /**
-     * FIXME: Crear en una utilidad y despues replazarlo
-     *
-     */
-
-    const product = await this.prisma.product.findUnique({
-      where: { id: createLocationDto.product_id },
-    });
-
-    if (!product) {
-      throw new NotFoundException(
-        `Product with ID ${createLocationDto.product_id} not found`,
-      );
-    }
-
-    /** */
-
-    //FIXME: crear una utilidad
-    // Check if location code is unique within warehouse
-    const existingLocation = await this.prisma.location.findFirst({
-      where: {
-        warehouse_id: createLocationDto.warehouse_id,
-        section: createLocationDto.section,
-        shelf: createLocationDto.shelf,
-        level: createLocationDto.level,
-      },
-    });
-
-    if (existingLocation) {
-      throw new ConflictException(
-        'Location with this section, shelf, and level already exists in this warehouse',
-      );
-    }
-
-    /** */
+    const locationValidate: WarehouseLocation = {
+      warehouseId: createLocationDto.warehouse_id,
+      section: createLocationDto.section,
+      shelf: createLocationDto.shelf,
+      level: createLocationDto.level,
+    };
+    await this.validatorLocation.validateUniqueLocation(locationValidate);
 
     const location = await this.prisma.location.create({
       data: {
@@ -75,7 +50,6 @@ export class LocationsService {
       },
     });
 
-    // Update warehouse used capacity
     await this.updateWarehouseCapacity(createLocationDto.warehouse_id);
 
     return new LocationEntity({
@@ -109,6 +83,8 @@ export class LocationsService {
   }
 
   async findByWarehouse(warehouseId: string): Promise<LocationEntity[]> {
+    await this.validatorWarehouse.validateWarehouseExists(warehouseId);
+
     const locations = await this.prisma.location.findMany({
       where: { warehouse_id: warehouseId },
       include: {
@@ -158,34 +134,32 @@ export class LocationsService {
   ): Promise<LocationEntity> {
     const existingLocation = await this.findOne(id);
 
-    // If changing warehouse, product, section, shelf, or level, check for conflicts
     if (
       updateLocationDto.warehouse_id ||
       updateLocationDto.section ||
       updateLocationDto.shelf ||
       updateLocationDto.level
     ) {
-      const warehouseId =
-        updateLocationDto.warehouse_id || existingLocation.warehouse_id;
-      const section = updateLocationDto.section || existingLocation.section;
-      const shelf = updateLocationDto.shelf || existingLocation.shelf;
-      const level = updateLocationDto.level || existingLocation.level;
+      const locationValidate: WarehouseLocation = {
+        warehouseId:
+          updateLocationDto.warehouse_id || existingLocation.warehouse_id,
+        section: updateLocationDto.section || existingLocation.section,
+        shelf: updateLocationDto.shelf || existingLocation.shelf,
+        level: updateLocationDto.level || existingLocation.level,
+      };
+      await this.validatorLocation.validateUniqueLocation(locationValidate, id);
+    }
 
-      const conflictingLocation = await this.prisma.location.findFirst({
-        where: {
-          warehouse_id: warehouseId,
-          section,
-          shelf,
-          level,
-          NOT: { id },
-        },
-      });
+    if (updateLocationDto.warehouse_id) {
+      await this.validatorWarehouse.validateWarehouseExists(
+        updateLocationDto.warehouse_id,
+      );
+    }
 
-      if (conflictingLocation) {
-        throw new ConflictException(
-          'Location with this section, shelf, and level already exists in this warehouse',
-        );
-      }
+    if (updateLocationDto.product_id) {
+      await this.validatorProduct.validateProductExists(
+        updateLocationDto.product_id,
+      );
     }
 
     const location = await this.prisma.location.update({
@@ -197,7 +171,6 @@ export class LocationsService {
       },
     });
 
-    // Update warehouse capacity if warehouse changed
     if (updateLocationDto.warehouse_id) {
       await this.updateWarehouseCapacity(updateLocationDto.warehouse_id);
       await this.updateWarehouseCapacity(existingLocation.warehouse_id);
@@ -229,16 +202,9 @@ export class LocationsService {
   ): Promise<LocationEntity> {
     const location = await this.findOne(locationId);
 
-    // Check if product exists
-    const product = await this.prisma.product.findUnique({
-      where: { id: assignProductDto.product_id },
-    });
-
-    if (!product) {
-      throw new NotFoundException(
-        `Product with ID ${assignProductDto.product_id} not found`,
-      );
-    }
+    await this.validatorProduct.validateProductExists(
+      assignProductDto.product_id,
+    );
 
     const updatedLocation = await this.prisma.location.update({
       where: { id: locationId },

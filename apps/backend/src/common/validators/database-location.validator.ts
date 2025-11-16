@@ -4,18 +4,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { WarehouseLocation } from '../types/location';
 
 @Injectable()
 export class DatabaseLocationValidator {
   constructor(private prisma: PrismaService) {}
 
   async validateUniqueLocation(
-    warehouseId: string,
-    section: string,
-    shelf: string,
-    level: string,
+    location: WarehouseLocation,
     excludeId?: string,
   ): Promise<void> {
+    const { warehouseId, section, shelf, level } = location;
     const existingLocation = await this.prisma.location.findFirst({
       where: {
         warehouse_id: warehouseId,

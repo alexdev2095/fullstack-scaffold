@@ -12,7 +12,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-// import { CreateProductImageDto } from './create-product-image.dto';
+import { CreateProductImageDto } from './create-product-images.dto';
 
 export class CreateProductDto {
   @ApiProperty({
@@ -160,13 +160,13 @@ export class CreateProductDto {
   @IsOptional()
   is_active?: boolean;
 
-  //   @ApiPropertyOptional({
-  //     type: [CreateProductImageDto],
-  //     description: 'Product images',
-  //   })
-  //   @IsArray()
-  //   @ValidateNested({ each: true })
-  //   @Type(() => CreateProductImageDto)
-  //   @IsOptional()
-  //   images?: CreateProductImageDto[];
+  @ApiPropertyOptional({
+    type: [CreateProductImageDto],
+    description: 'Product images',
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductImageDto)
+  @IsOptional()
+  images?: CreateProductImageDto[];
 }
