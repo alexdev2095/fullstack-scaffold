@@ -9,7 +9,8 @@ import { IoLogOutOutline, IoMenuOutline } from "react-icons/io5";
 import { Logo } from "@/components/ui-custom/logo";
 import { Button } from "@/components/ui/button";
 import { NavTabs } from "@/components/ui-custom/nav-tabs/NavTabs";
-import { menuConfig, menuSiderbar } from "./menuSiderbar";
+import { menuConfig } from "./menuConfig";
+import { menuSiderbar } from "./menuSiderbar";
 
 export function Sidebar() {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);

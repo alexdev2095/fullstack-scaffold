@@ -3,7 +3,7 @@ import React from "react";
 import { menuItems } from "../components/menu/menuItem";
 import NavTabsContainer from "@/components/ui-custom/nav-tabs/NavTabsContainer";
 
-const WarehouseContainer = () => {
+const SctokMovementsContainer = () => {
   return (
     <div className="space-y-5">
       <TitleDashboard
@@ -19,4 +19,4 @@ const WarehouseContainer = () => {
   );
 };
 
-export default WarehouseContainer;
+export default SctokMovementsContainer;

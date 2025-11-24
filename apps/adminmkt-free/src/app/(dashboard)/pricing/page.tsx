@@ -1,15 +1,19 @@
-import { Title } from "@/components/ui-custom/title";
+"use client";
+import { mockWarehouses } from "@/core/mock-data";
+import { WarehouseCard } from "@/sections/warehouse/components/warehouse-card";
 
 export default function PricingPage() {
   return (
-    <div className="space-y-10">
-      <div className="space-y-4">
-        <div className="space-y-2 flex flex-col items-center justify-center">
-          <Title>Elija el plan adecuado a sus necesidades</Title>
-          <p className="text-muted-foreground text-sm">
-            Desbloquea todas las funcionalidades de la plataforma.
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-8 space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {mockWarehouses.map((w) => (
+          <WarehouseCard
+            key={w.id}
+            warehouse={w}
+            onView={(w) => console.log("ver", w)}
+            onEdit={(w) => console.log("editar", w)}
+          />
+        ))}
       </div>
     </div>
   );

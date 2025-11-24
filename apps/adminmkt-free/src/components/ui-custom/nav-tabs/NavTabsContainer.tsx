@@ -4,14 +4,14 @@ import Link from "next/link";
 import { IoAdd } from "react-icons/io5";
 
 type NavProps = {
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
   href?: string;
   titleButtom?: string;
 };
 const NavTabsContainer = ({ menuItems, href, titleButtom }: NavProps) => {
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-      <NavTabs menuItems={menuItems} />
+      {menuItems ? <NavTabs menuItems={menuItems} /> : <div></div>}
       {href ? (
         <Link
           href={href}

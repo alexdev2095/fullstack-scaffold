@@ -190,16 +190,6 @@ export class ProductsService {
       },
     });
 
-    // const product = await this.prisma.product.update({
-    //   where: { id },
-    //   data: updateProductDto,
-    //   include: {
-    //     images: {
-    //       orderBy: { order: 'asc' },
-    //     },
-    //   },
-    // });
-
     // Handle images separately to avoid complex nested updates
     if (updateProductDto.images) {
       // Delete existing images

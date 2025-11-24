@@ -1,5 +1,5 @@
-import WarehouseContainer from "@/sections/products/containers/WarehouseContainer";
+import SctokMovementsContainer from "@/sections/products/containers/SctokMovementsContainer";
 
 export default function WarehousePage() {
-  return <WarehouseContainer />;
+  return <SctokMovementsContainer />;
 }
